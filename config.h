@@ -1,27 +1,36 @@
 #include <X11/XF86keysym.h>
+
+/* Taken from https://github.com/djpohly/dwl/issues/466 */
+#define COLOR(hex)    { ((hex >> 24) & 0xFF) / 255.0f, \
+                        ((hex >> 16) & 0xFF) / 255.0f, \
+                        ((hex >> 8) & 0xFF) / 255.0f, \
+                        (hex & 0xFF) / 255.0f }
 /* appearance */
 static const int sloppyfocus               = 1;  /* focus follows mouse */
 static const int bypass_surface_visibility = 0;  /* 1 means idle inhibitors will disable idle tracking even if it's surface isn't visible  */
 static const int smartgaps                 = 0;  /* 1 means no outer gap when there is only one window */
 static const unsigned int borderpx         = 1;  /* border pixel of windows */
 static const unsigned int gappx            = 5;  /* horiz inner gap between windows */
-static const float bordercolor[]           = {0.157, 0.157, 0.157, 1.0};
-static const float focuscolor[]            = {0.922, 0.859, 0.698, 1.0};
+static const float bordercolor[]           = COLOR(0x00000000);
+static const float focuscolor[]            = COLOR(0xebdbb2ff);
+static const float urgentcolor[]           = COLOR(0xcc241dff);
 /* To conform the xdg-protocol, set the alpha to zero to restore the old behavior */
-static const float fullscreen_bg[]         = {0.157, 0.157, 0.157, 1.0};
+static const float fullscreen_bg[]         = {0.1, 0.1, 0.1, 1.0}; /* You can also use glsl colors */
 
 /* Autostart */
 static const char *const autostart[] = {
-        "swayidle", "-w", "timeout", "120", "swaylock -f", "timeout", "120", "wlr-randr --output LVDS-1 --off", "resume", "wlr-randr --output LVDS-1 --on", "timeout", "900", "loginctl suspend", "before-sleep", "swaylock -f", NULL,
-        "dunst", NULL,
+        "swayidle", "-w", "timeout", "100", "idle-brightness lower", "resume", "idle-brightness restore", "timeout", "120", "swaylock -f", "timeout", "120", "wlr-randr --output LVDS-1 --off", "resume", "wlr-randr --output LVDS-1 --on", "timeout", "900", "loginctl suspend", "before-sleep", "swaylock -f", NULL,
+        "swaync", NULL,
         "low-battery-notification", NULL,
         "someblocks", NULL,
         NULL /* terminate */
 };
 
-/* tagging - tagcount must be no greater than 31 */
+/* tagging - TAGCOUNT must be no greater than 31 */
 #define TAGCOUNT (9)
-static const int tagcount = TAGCOUNT;
+
+/* logging */
+static int log_level = WLR_ERROR;
 
 static const Rule rules[] = {
 	/* app_id	title       tags mask	isfloating   monitor */
@@ -117,6 +126,7 @@ static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TA
 /* commands */
 static const char *termcmd[] = { "kitty", NULL };
 static const char *menucmd[] = { "tofi-drun", "--drun-launch=true", NULL };
+static const char *lockcmd[] = { "swaylock" ,NULL };
 static const char *bookmarks[] = { "bookmarks" , NULL };
 
 static const char *volume_raise[] = { "change-volume", "raise", NULL };
@@ -135,6 +145,7 @@ static const Key keys[] = {
 	/* modifier                  key                 function        argument */
 	{ MODKEY,                    XKB_KEY_p,          spawn,          {.v = menucmd} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Return,     spawn,          {.v = termcmd} },
+	{ MODKEY,                    XKB_KEY_x,          spawn,          {.v = lockcmd} },
 	{ MODKEY,                    XKB_KEY_b,          spawn,          {.v = bookmarks} },
 	{ MODKEY,                    XKB_KEY_j,          focusstack,     {.i = +1} },
 	{ MODKEY,                    XKB_KEY_k,          focusstack,     {.i = -1} },

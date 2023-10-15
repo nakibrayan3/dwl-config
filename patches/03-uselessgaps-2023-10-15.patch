@@ -1,32 +1,28 @@
-From 366a810531ce3425ea5eca4e32eba431dc26570e Mon Sep 17 00:00:00 2001
-From: serenevoid <ajuph9224@gmail.com>
-Date: Sun, 16 Jul 2023 22:07:02 +0530
-Subject: [PATCH] feat(gaps): Useless Gaps
+From 5f2a63800f757afeb0740d8c7ea534aecc5a68b5 Mon Sep 17 00:00:00 2001
+From: Rayan Nakib <rayan.nakib@tutamail.com>
+Date: Sun, 15 Oct 2023 09:38:16 +0100
+Subject: [PATCH] update patch uselessgaps to build with new sources
 
-- KISS (Keep it simple and stupid)
-- Use common gap value instead of separate inner and outer gaps
-- Set gap value in config.h and toggle gaps on or off
-- minimal and efficient
 ---
  config.def.h |  3 +++
  dwl.c        | 41 +++++++++++++++++++++++++++++++----------
  2 files changed, 34 insertions(+), 10 deletions(-)
 
 diff --git a/config.def.h b/config.def.h
-index 447ba0051..16ad12ce8 100644
+index 4e30885b..c3ca15ca 100644
 --- a/config.def.h
 +++ b/config.def.h
-@@ -1,7 +1,9 @@
+@@ -6,7 +6,9 @@
  /* appearance */
  static const int sloppyfocus               = 1;  /* focus follows mouse */
  static const int bypass_surface_visibility = 0;  /* 1 means idle inhibitors will disable idle tracking even if it's surface isn't visible  */
 +static const int smartgaps                 = 0;  /* 1 means no outer gap when there is only one window */
  static const unsigned int borderpx         = 1;  /* border pixel of windows */
-+static const unsigned int gappx           = 10; /* horiz inner gap between windows */
- static const float bordercolor[]           = {0.5, 0.5, 0.5, 1.0};
- static const float focuscolor[]            = {1.0, 0.0, 0.0, 1.0};
- /* To conform the xdg-protocol, set the alpha to zero to restore the old behavior */
-@@ -119,6 +121,7 @@ static const Key keys[] = {
++static const unsigned int gappx            = 10; /* horiz inner gap between windows */
+ static const float bordercolor[]           = COLOR(0x444444ff);
+ static const float focuscolor[]            = COLOR(0x005577ff);
+ static const float urgentcolor[]           = COLOR(0xff0000ff);
+@@ -128,6 +130,7 @@ static const Key keys[] = {
  	{ MODKEY,                    XKB_KEY_l,          setmfact,       {.f = +0.05} },
  	{ MODKEY,                    XKB_KEY_Return,     zoom,           {0} },
  	{ MODKEY,                    XKB_KEY_Tab,        view,           {0} },
@@ -35,7 +31,7 @@ index 447ba0051..16ad12ce8 100644
  	{ MODKEY,                    XKB_KEY_t,          setlayout,      {.v = &layouts[0]} },
  	{ MODKEY,                    XKB_KEY_f,          setlayout,      {.v = &layouts[1]} },
 diff --git a/dwl.c b/dwl.c
-index 93f66efe6..aea07d68c 100644
+index a7d41b08..380c4955 100644
 --- a/dwl.c
 +++ b/dwl.c
 @@ -185,6 +185,7 @@ struct Monitor {
@@ -63,7 +59,7 @@ index 93f66efe6..aea07d68c 100644
  /* global event handlers */
  static struct wl_listener cursor_axis = {.notify = axisnotify};
  static struct wl_listener cursor_button = {.notify = buttonpress};
-@@ -913,6 +917,7 @@ createmon(struct wl_listener *listener, void *data)
+@@ -907,6 +911,7 @@ createmon(struct wl_listener *listener, void *data)
  	/* Initialize monitor state using configured rules */
  	for (i = 0; i < LENGTH(m->layers); i++)
  		wl_list_init(&m->layers[i]);
@@ -71,7 +67,7 @@ index 93f66efe6..aea07d68c 100644
  	m->tagset[0] = m->tagset[1] = 1;
  	for (r = monrules; r < END(monrules); r++) {
  		if (!r->name || strstr(wlr_output->name, r->name)) {
-@@ -2361,7 +2366,7 @@ tagmon(const Arg *arg)
+@@ -2359,7 +2364,7 @@ tagmon(const Arg *arg)
  void
  tile(Monitor *m)
  {
@@ -80,14 +76,14 @@ index 93f66efe6..aea07d68c 100644
  	Client *c;
  
  	wl_list_for_each(c, &clients, link)
-@@ -2370,22 +2375,31 @@ tile(Monitor *m)
+@@ -2368,22 +2373,31 @@ tile(Monitor *m)
  	if (n == 0)
  		return;
  
 +	if (smartgaps == n) {
 +		e = 0; // outer gaps disabled
 +	}
-+ 
++
  	if (n > m->nmaster)
 -		mw = m->nmaster ? m->w.width * m->mfact : 0;
 +		mw = m->nmaster ? (m->w.width + m->gappx*e) * m->mfact : 0;
@@ -121,7 +117,7 @@ index 93f66efe6..aea07d68c 100644
  		}
  		i++;
  	}
-@@ -2408,6 +2422,13 @@ togglefullscreen(const Arg *arg)
+@@ -2406,6 +2420,13 @@ togglefullscreen(const Arg *arg)
  		setfullscreen(sel, !sel->isfullscreen);
  }
  
