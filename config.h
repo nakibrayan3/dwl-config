@@ -35,9 +35,9 @@ static const char *const autostart[] = {
 static int log_level = WLR_ERROR;
 
 static const Rule rules[] = {
-	/* app_id	title       tags        mask	        isfloating    monitor */
+	/* app_id	title       tags        mask          isfloating    monitor */
 	{ "firefox",          NULL,       1 << 8,       0,            -1 },
-	{ "mpv",              4,          NULL,         0,            -1 },
+	{ "mpv",              NULL,       1 << 3,       0,            -1 },
 };
 
 /* layout(s) */
@@ -65,7 +65,7 @@ static const struct xkb_rule_names xkb_rules = {
 	.options = "ctrl:nocaps",
 	*/
 	.layout = "us,ara",
-	.options = "grp:alt_shift_toggle",
+	.options = "grp:win_space_toggle",
 };
 
 static const int repeat_rate = 25;
