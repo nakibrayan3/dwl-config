@@ -20,9 +20,11 @@ static const float fullscreen_bg[]         = {0.1, 0.1, 0.1, 1.0}; /* You can al
 /* Autostart */
 static const char *const autostart[] = {
         "swayidle", "-w", "timeout", "100", "idle-brightness lower", "resume", "idle-brightness restore", "timeout", "120", "swaylock -f", "timeout", "120", "wlr-randr --output LVDS-1 --off", "resume", "wlr-randr --output LVDS-1 --on", "timeout", "900", "loginctl suspend", "before-sleep", "swaylock -f", NULL,
-        "swaync", NULL,
+        "gentoo-pipewire-launcher", NULL,
+        "dunst", NULL,
         "low-battery-notification", NULL,
         "someblocks", NULL,
+        "setbackgound", NULL,
         NULL /* terminate */
 };
 
@@ -33,9 +35,9 @@ static const char *const autostart[] = {
 static int log_level = WLR_ERROR;
 
 static const Rule rules[] = {
-	/* app_id	title       tags mask	isfloating   monitor */
-	{ "firefox", 	NULL,       1 << 8,     0,           -1 },
-	{ "mpv",	NULL,       1 << 3,     0,           -1 },
+	/* app_id	title       tags        mask	        isfloating    monitor */
+	{ "firefox",          NULL,       1 << 8,       0,            -1 },
+	{ "mpv",              4,          NULL,         0,            -1 },
 };
 
 /* layout(s) */
@@ -72,8 +74,8 @@ static const int repeat_delay = 600;
 /* Trackpad */
 static const int tap_to_click = 1;
 static const int tap_and_drag = 1;
-static const int drag_lock = 0;
-static const int natural_scrolling = 1;
+static const int drag_lock = 1;
+static const int natural_scrolling = 0;
 static const int disable_while_typing = 1;
 static const int left_handed = 0;
 static const int middle_button_emulation = 0;
@@ -112,7 +114,7 @@ LIBINPUT_CONFIG_TAP_MAP_LMR -- 1/2/3 finger tap maps to left/middle/right
 static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TAP_MAP_LRM;
 
 /* If you want to use the windows key for MODKEY, use WLR_MODIFIER_LOGO */
-#define MODKEY WLR_MODIFIER_LOGO
+#define MODKEY WLR_MODIFIER_ALT
 
 #define TAGKEYS(KEY,SKEY,TAG) \
 	{ MODKEY,                    KEY,            view,            {.ui = 1 << TAG} }, \
